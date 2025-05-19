@@ -1,0 +1,7 @@
+RewriteEngine On
+PassengerEnabled On
+PassengerPython /path/to/your/python/environment
+PassengerAppRoot /path/to/your/app
+PassengerAppType wsgi
+PassengerStartupFile wsgi.py
+PassengerWSGIApplicationGroup %{GLOBAL}
