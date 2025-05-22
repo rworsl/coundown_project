@@ -3,28 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Countdown Timer{% endblock %}</title>
+    <title>{% block title %}Remote Timer Control{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <header class="header">
-            <h1>{% block header %}Countdown Timer{% endblock %}</h1>
-        </header>
-        
-        <main>
-            {% block content %}{% endblock %}
-        </main>
-        
-        <footer>
-            <p style="text-align: center; margin-top: 3rem; color: var(--secondary-text);">
-                &copy; {% now year %} Countdown Timer App
-            </p>
-        </footer>
+        {% block content %}{% endblock %}
     </div>
     
     {% block scripts %}

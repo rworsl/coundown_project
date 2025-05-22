@@ -1,4 +1,43 @@
+// Dark mode functionality
+function initializeTheme() {
+  const themeToggle = document.getElementById('theme-toggle');
+  if (!themeToggle) return;
+  
+  const sunIcon = themeToggle.querySelector('.sun-icon');
+  const moonIcon = themeToggle.querySelector('.moon-icon');
+  
+  // Check for saved theme preference or default to light mode
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  
+  // Update icon based on current theme
+  updateThemeIcon(savedTheme, sunIcon, moonIcon);
+  
+  // Add click event listener
+  themeToggle.addEventListener('click', () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme, sunIcon, moonIcon);
+  });
+}
+
+function updateThemeIcon(theme, sunIcon, moonIcon) {
+  if (theme === 'dark') {
+    sunIcon.style.display = 'none';
+    moonIcon.style.display = 'block';
+  } else {
+    sunIcon.style.display = 'block';
+    moonIcon.style.display = 'none';
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+  // Initialize theme first
+  initializeTheme();
+  
   // Get timer ID from the page
   const timerId = document.getElementById('timer-container').dataset.timerId;
   const isController = document.getElementById('timer-container').dataset.isController === 'True';
@@ -83,16 +122,19 @@ document.addEventListener('DOMContentLoaded', function() {
     timeElement.textContent = formattedTime;
     
     // Update title for better UX
-    document.title = `${formattedTime} - Countdown Timer`;
+    document.title = `${formattedTime} - Remote Timer Control`;
   }
   
   // Function to update timer status display
   function updateTimerStatus(status) {
     const statusElement = document.getElementById('timer-status');
     
+    // Remove all status classes
+    statusElement.classList.remove('running', 'paused', 'finished');
+    
     if (status === 'running') {
       statusElement.textContent = 'Running';
-      statusElement.classList.remove('timer-finished');
+      statusElement.classList.add('running');
       
       // Update button states
       const startBtn = document.getElementById('start-btn');
@@ -105,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
     } 
     else if (status === 'paused') {
       statusElement.textContent = 'Paused';
-      statusElement.classList.remove('timer-finished');
+      statusElement.classList.add('paused');
       
       // Update button states
       const startBtn = document.getElementById('start-btn');
@@ -118,10 +160,8 @@ document.addEventListener('DOMContentLoaded', function() {
     } 
     else if (status === 'finished') {
       statusElement.textContent = 'Finished!';
-      statusElement.classList.add('timer-finished');
-      document.title = 'Time\'s Up! - Countdown Timer';
-      
-      // Play sound or visual alert here (optional)
+      statusElement.classList.add('finished');
+      document.title = 'Time\'s Up! - Remote Timer Control';
       
       // Update button states
       const startBtn = document.getElementById('start-btn');
@@ -277,16 +317,20 @@ document.addEventListener('DOMContentLoaded', function() {
     
     copyButtons.forEach(button => {
       button.addEventListener('click', () => {
-        const linkInput = button.closest('.link-box').querySelector('.link-input');
+        const linkInput = button.closest('.link-item').querySelector('.link-input');
         linkInput.select();
         document.execCommand('copy');
         
         // Show feedback
         const originalText = button.textContent;
-        button.textContent = 'Copied!';
+        button.textContent = 'Copied';
+        button.style.background = 'var(--success)';
+        button.style.color = 'white';
         
         setTimeout(() => {
           button.textContent = originalText;
+          button.style.background = '';
+          button.style.color = '';
         }, 2000);
       });
     });

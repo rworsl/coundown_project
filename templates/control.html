@@ -1,55 +1,77 @@
 {% extends "base.html" %}
 
-{% block title %}Timer Control{% endblock %}
-{% block header %}Timer Control{% endblock %}
+{% block title %}Timer Control - Remote Timer Control{% endblock %}
 
 {% block content %}
-<div id="timer-container" data-timer-id="{{ timer_id }}" data-is-controller="True">
-    <div class="timer-display">
-        <div id="timer-status" class="timer-status">{{ timer.status.capitalize() }}</div>
-        <div id="time" class="time">
-            {% set hours = (timer.remaining // 3600) | int %}
-            {% set minutes = ((timer.remaining % 3600) // 60) | int %}
-            {% set seconds = (timer.remaining % 60) | int %}
-            {{ "%02d:%02d:%02d" | format(hours, minutes, seconds) }}
-        </div>
-    </div>
-    
-    <div class="controls">
-        <button id="start-btn" class="btn btn-primary" {% if timer.status == "running" %}disabled{% endif %}>Start</button>
-        <button id="pause-btn" class="btn btn-secondary" {% if timer.status != "running" %}disabled{% endif %}>Pause</button>
-        <button id="reset-btn" class="btn btn-danger">Reset</button>
-    </div>
-    
-    <div class="duration-form">
-        <form id="duration-form">
-            <div class="form-group">
-                <label for="duration-input" class="form-label">Set Duration (HH:MM:SS)</label>
-                <input 
-                    type="text" 
-                    id="duration-input" 
-                    class="form-input" 
-                    placeholder="10:00"
-                    pattern="^(\d+:)?(\d{1,2}:)?\d{1,2}$"
-                    required
-                >
-            </div>
-            <button type="submit" class="btn btn-primary">Set Time</button>
-        </form>
-    </div>
-    
-    <div class="timer-links">
-        <h3 class="timer-links-title">Share Links</h3>
+<div class="timer-card">
+    <div id="timer-container" data-timer-id="{{ timer_id }}" data-is-controller="True">
         
-        <div class="link-box">
-            <p>Display Link (view-only):</p>
-            <input type="text" class="link-input" value="{{ request.url_root }}?id={{ timer_id }}" readonly>
-            <button class="btn btn-secondary copy-btn">Copy Link</button>
+        <div class="timer-header">
+            <h1>Timer Control</h1>
+            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+                <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="timer-body">
+            <div class="timer-display">
+                <div id="timer-status" class="timer-status {{ timer.status }}">{{ timer.status.capitalize() }}</div>
+                <div id="time" class="time">
+                    {% set hours = (timer.remaining // 3600) | int %}
+                    {% set minutes = ((timer.remaining % 3600) // 60) | int %}
+                    {% set seconds = (timer.remaining % 60) | int %}
+                    {{ "%02d:%02d:%02d" | format(hours, minutes, seconds) }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls-section">
+            <div class="controls">
+                <button id="start-btn" class="btn btn-primary" {% if timer.status == "running" %}disabled{% endif %}>Start</button>
+                <button id="pause-btn" class="btn" {% if timer.status != "running" %}disabled{% endif %}>Pause</button>
+                <button id="reset-btn" class="btn btn-danger">Reset</button>
+            </div>
+            
+            <div class="duration-section">
+                <div class="section-title">Set Duration</div>
+                <form id="duration-form" class="duration-form">
+                    <div class="form-group">
+                        <label for="duration-input" class="form-label">Time (HH:MM:SS)</label>
+                        <input 
+                            type="text" 
+                            id="duration-input" 
+                            class="form-input" 
+                            placeholder="10:00"
+                            pattern="^(\d+:)?(\d{1,2}:)?\d{1,2}$"
+                            required
+                        >
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="links-section">
+            <div class="section-title">Share Links</div>
+            <div class="links-grid">
+                <div class="link-item">
+                    <div>
+                        <div class="link-label">Display Link (View Only)</div>
+                        <input type="text" class="link-input" value="{{ request.url_root }}?id={{ timer_id }}" readonly>
+                    </div>
+                    <button class="btn copy-btn">Copy</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="view-only-link">
+            <a href="{{ url_for('index') }}?id={{ timer_id }}">View timer display</a>
         </div>
     </div>
-    
-    <p style="text-align: center; margin: 2rem 0;">
-        <a href="{{ url_for('index') }}?id={{ timer_id }}" class="btn btn-secondary">Go to timer view</a>
-    </p>
 </div>
 {% endblock %}

@@ -157,4 +157,4 @@ def clean_timers():
     print(f"Cleaned up {len(to_delete)} timers")
 
 if __name__ == '__main__':
-    socketio.run(app, debug=Config.DEBUG, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    socketio.run(app, debug=Config.DEBUG, host='0.0.0.0', port=int(os.environ.get('PORT', 8443)))
