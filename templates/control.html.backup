@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Timer Control{% endblock %}
+{% block header %}Timer Control{% endblock %}
+
+{% block content %}
+<div id="timer-container" data-timer-id="{{ timer_id }}" data-is-controller="True">
+    <div class="timer-display">
+        <div id="timer-status" class="timer-status">{{ timer.status.capitalize() }}</div>
+        <div id="time" class="time">
+            {% set hours = (timer.remaining // 3600) | int %}
+            {% set minutes = ((timer.remaining % 3600) // 60) | int %}
+            {% set seconds = (timer.remaining % 60) | int %}
+            {{ "%02d:%02d:%02d" | format(hours, minutes, seconds) }}
+        </div>
+    </div>
+    
+    <div class="controls">
+        <button id="start-btn" class="btn btn-primary" {% if timer.status == "running" %}disabled{% endif %}>Start</button>
+        <button id="pause-btn" class="btn btn-secondary" {% if timer.status != "running" %}disabled{% endif %}>Pause</button>
+        <button id="reset-btn" class="btn btn-danger">Reset</button>
+    </div>
+    
+    <div class="duration-form">
+        <form id="duration-form">
+            <div class="form-group">
+                <label for="duration-input" class="form-label">Set Duration (HH:MM:SS)</label>
+                <input 
+                    type="text" 
+                    id="duration-input" 
+                    class="form-input" 
+                    placeholder="10:00"
+                    pattern="^(\d+:)?(\d{1,2}:)?\d{1,2}$"
+                    required
+                >
+            </div>
+            <button type="submit" class="btn btn-primary">Set Time</button>
+        </form>
+    </div>
+    
+    <div class="timer-links">
+        <h3 class="timer-links-title">Share Links</h3>
+        
+        <div class="link-box">
+            <p>Display Link (view-only):</p>
+            <input type="text" class="link-input" value="{{ request.url_root }}?id={{ timer_id }}" readonly>
+            <button class="btn btn-secondary copy-btn">Copy Link</button>
+        </div>
+    </div>
+    
+    <p style="text-align: center; margin: 2rem 0;">
+        <a href="{{ url_for('index') }}?id={{ timer_id }}" class="btn btn-secondary">Go to timer view</a>
+    </p>
+</div>
+{% endblock %}

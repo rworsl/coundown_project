@@ -3,6 +3,15 @@
 {% block title %}Remote Timer Control{% endblock %}
 
 {% block content %}
+<div class="ad-container ad-top">
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-XXXXXXXXXX"
+         data-ad-slot="XXXXXXXXXX"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+</div>
+
 <div class="timer-card">
     <div id="timer-container" data-timer-id="{{ timer_id }}" data-is-controller="{{ 'True' if is_controller else 'False' }}">
         
@@ -84,4 +93,30 @@
         {% endif %}
     </div>
 </div>
+
+<!-- Bottom Ad -->
+<div class="ad-container ad-bottom">
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-XXXXXXXXXX"
+         data-ad-slot="XXXXXXXXXX"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+</div>
+
+<!-- Sidebar Ad (desktop only) -->
+<div class="ad-sidebar">
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-XXXXXXXXXX"
+         data-ad-slot="XXXXXXXXXX"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+</div>
+
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+     (adsbygoogle = window.adsbygoogle || []).push({});
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
 {% endblock %}

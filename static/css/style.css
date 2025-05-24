@@ -350,6 +350,38 @@ body {
   color: var(--text-primary);
 }
 
+/* Ad containers */
+.ad-container {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+  padding: 1rem;
+}
+
+.ad-top {
+  margin-bottom: 2rem;
+}
+
+.ad-bottom {
+  margin-top: 2rem;
+  border-top: 1px solid var(--border);
+  padding-top: 2rem;
+}
+
+.ad-sidebar {
+  position: fixed;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+}
+
+@media (max-width: 1200px) {
+  .ad-sidebar {
+    display: none;
+  }
+}
+
 /* Dark mode toggle */
 .theme-toggle {
   background: none;

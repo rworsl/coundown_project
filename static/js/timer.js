@@ -1,3 +1,115 @@
+// Sound functionality
+class TimerSounds {
+  constructor() {
+    this.audioContext = null;
+    this.sounds = {
+      beep: this.createBeepSound,
+      chime: this.createChimeSound,
+      bell: this.createBellSound,
+      buzzer: this.createBuzzerSound
+    };
+    this.selectedSound = localStorage.getItem('timerSound') || 'beep';
+  }
+
+  async initAudio() {
+    if (!this.audioContext) {
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    
+    if (this.audioContext.state === 'suspended') {
+      await this.audioContext.resume();
+    }
+  }
+
+  createBeepSound() {
+    const oscillator = this.audioContext.createOscillator();
+    const gainNode = this.audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(this.audioContext.destination);
+    
+    oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
+    gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
+    
+    oscillator.start(this.audioContext.currentTime);
+    oscillator.stop(this.audioContext.currentTime + 0.3);
+  }
+
+  createChimeSound() {
+    const frequencies = [523.25, 659.25, 783.99]; // C5, E5, G5
+    frequencies.forEach((freq, index) => {
+      const oscillator = this.audioContext.createOscillator();
+      const gainNode = this.audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(this.audioContext.destination);
+      
+      oscillator.frequency.setValueAtTime(freq, this.audioContext.currentTime);
+      oscillator.type = 'sine';
+      gainNode.gain.setValueAtTime(0.2, this.audioContext.currentTime + index * 0.2);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + index * 0.2 + 0.5);
+      
+      oscillator.start(this.audioContext.currentTime + index * 0.2);
+      oscillator.stop(this.audioContext.currentTime + index * 0.2 + 0.5);
+    });
+  }
+
+  createBellSound() {
+    const oscillator = this.audioContext.createOscillator();
+    const gainNode = this.audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(this.audioContext.destination);
+    
+    oscillator.frequency.setValueAtTime(1000, this.audioContext.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(400, this.audioContext.currentTime + 0.1);
+    oscillator.type = 'sine';
+    
+    gainNode.gain.setValueAtTime(0.4, this.audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 1);
+    
+    oscillator.start(this.audioContext.currentTime);
+    oscillator.stop(this.audioContext.currentTime + 1);
+  }
+
+  createBuzzerSound() {
+    for (let i = 0; i < 3; i++) {
+      const oscillator = this.audioContext.createOscillator();
+      const gainNode = this.audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(this.audioContext.destination);
+      
+      oscillator.frequency.setValueAtTime(200, this.audioContext.currentTime + i * 0.15);
+      oscillator.type = 'square';
+      gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime + i * 0.15);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + i * 0.15 + 0.1);
+      
+      oscillator.start(this.audioContext.currentTime + i * 0.15);
+      oscillator.stop(this.audioContext.currentTime + i * 0.15 + 0.1);
+    }
+  }
+
+  async playSound(soundType = this.selectedSound) {
+    if (soundType === 'none') return;
+    
+    try {
+      await this.initAudio();
+      if (this.sounds[soundType]) {
+        this.sounds[soundType].call(this);
+      }
+    } catch (error) {
+      console.warn('Could not play sound:', error);
+    }
+  }
+
+  setSound(soundType) {
+    this.selectedSound = soundType;
+    localStorage.setItem('timerSound', soundType);
+  }
+}
+
 // Dark mode functionality
 function initializeTheme() {
   const themeToggle = document.getElementById('theme-toggle');
@@ -6,14 +118,11 @@ function initializeTheme() {
   const sunIcon = themeToggle.querySelector('.sun-icon');
   const moonIcon = themeToggle.querySelector('.moon-icon');
   
-  // Check for saved theme preference or default to light mode
   const savedTheme = localStorage.getItem('theme') || 'light';
   document.documentElement.setAttribute('data-theme', savedTheme);
   
-  // Update icon based on current theme
   updateThemeIcon(savedTheme, sunIcon, moonIcon);
   
-  // Add click event listener
   themeToggle.addEventListener('click', () => {
     const currentTheme = document.documentElement.getAttribute('data-theme');
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -34,9 +143,15 @@ function updateThemeIcon(theme, sunIcon, moonIcon) {
   }
 }
 
+// Initialize sound system
+const timerSounds = new TimerSounds();
+
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize theme first
   initializeTheme();
+  
+  // Initialize sound controls
+  initializeSoundControls();
   
   // Get timer ID from the page
   const timerId = document.getElementById('timer-container').dataset.timerId;
@@ -56,7 +171,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // Listen for timer updates from the server
   socket.on('timer_update', function(data) {
     if (data.timer_id === timerId) {
-      // Refresh the timer data
       fetchTimerData();
       
       if (data.status) {
@@ -80,20 +194,39 @@ document.addEventListener('DOMContentLoaded', function() {
   // Set up copy link buttons
   setupCopyButtons();
   
+  // Sound controls initialization
+  function initializeSoundControls() {
+    const soundSelect = document.getElementById('sound-select');
+    const testSoundBtn = document.getElementById('test-sound-btn');
+    
+    if (soundSelect) {
+      // Set saved sound preference
+      soundSelect.value = timerSounds.selectedSound;
+      
+      soundSelect.addEventListener('change', (e) => {
+        timerSounds.setSound(e.target.value);
+      });
+    }
+    
+    if (testSoundBtn) {
+      testSoundBtn.addEventListener('click', () => {
+        const selectedSound = soundSelect ? soundSelect.value : timerSounds.selectedSound;
+        timerSounds.playSound(selectedSound);
+      });
+    }
+  }
+  
   // Function to fetch the current timer data
   function fetchTimerData() {
     fetch(`/api/timer/${timerId}`)
       .then(response => response.json())
       .then(data => {
-        // Update local variables
         remainingTime = data.remaining;
         timerStatus = data.status;
         
-        // Update the display
         updateTimerDisplay(remainingTime);
         updateTimerStatus(timerStatus);
         
-        // Handle timer interval
         if (timerStatus === 'running') {
           startTimerInterval();
         } else {
@@ -107,12 +240,10 @@ document.addEventListener('DOMContentLoaded', function() {
   function updateTimerDisplay(seconds) {
     const timeElement = document.getElementById('time');
     
-    // Calculate hours, minutes, and seconds
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = Math.floor(seconds % 60);
     
-    // Format the time: HH:MM:SS
     const formattedTime = [
       hours.toString().padStart(2, '0'),
       minutes.toString().padStart(2, '0'),
@@ -120,8 +251,6 @@ document.addEventListener('DOMContentLoaded', function() {
     ].join(':');
     
     timeElement.textContent = formattedTime;
-    
-    // Update title for better UX
     document.title = `${formattedTime} - Remote Timer Control`;
   }
   
@@ -129,14 +258,12 @@ document.addEventListener('DOMContentLoaded', function() {
   function updateTimerStatus(status) {
     const statusElement = document.getElementById('timer-status');
     
-    // Remove all status classes
     statusElement.classList.remove('running', 'paused', 'finished');
     
     if (status === 'running') {
       statusElement.textContent = 'Running';
       statusElement.classList.add('running');
       
-      // Update button states
       const startBtn = document.getElementById('start-btn');
       const pauseBtn = document.getElementById('pause-btn');
       
@@ -149,7 +276,6 @@ document.addEventListener('DOMContentLoaded', function() {
       statusElement.textContent = 'Paused';
       statusElement.classList.add('paused');
       
-      // Update button states
       const startBtn = document.getElementById('start-btn');
       const pauseBtn = document.getElementById('pause-btn');
       
@@ -163,7 +289,9 @@ document.addEventListener('DOMContentLoaded', function() {
       statusElement.classList.add('finished');
       document.title = 'Time\'s Up! - Remote Timer Control';
       
-      // Update button states
+      // Play sound when timer finishes
+      timerSounds.playSound();
+      
       const startBtn = document.getElementById('start-btn');
       const pauseBtn = document.getElementById('pause-btn');
       
@@ -187,12 +315,11 @@ document.addEventListener('DOMContentLoaded', function() {
       
       updateTimerDisplay(current);
       
-      // Check if timer is finished
       if (current <= 0) {
         clearInterval(timerInterval);
         updateTimerStatus('finished');
       }
-    }, 100); // Update more frequently for smoother countdown
+    }, 100);
   }
   
   // Function to reset the timer display
@@ -272,21 +399,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const durationInput = document.getElementById('duration-input');
         const durationValue = durationInput.value.trim();
         
-        // Parse duration string (format: HH:MM:SS or MM:SS)
         let seconds = 0;
         
         if (durationValue.includes(':')) {
           const parts = durationValue.split(':').map(part => parseInt(part, 10) || 0);
           
           if (parts.length === 3) {
-            // HH:MM:SS format
             seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
           } else if (parts.length === 2) {
-            // MM:SS format
             seconds = parts[0] * 60 + parts[1];
           }
         } else {
-          // Just seconds
           seconds = parseInt(durationValue, 10) || 0;
         }
         
@@ -321,7 +444,6 @@ document.addEventListener('DOMContentLoaded', function() {
         linkInput.select();
         document.execCommand('copy');
         
-        // Show feedback
         const originalText = button.textContent;
         button.textContent = 'Copied';
         button.style.background = 'var(--success)';
