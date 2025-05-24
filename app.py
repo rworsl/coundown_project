@@ -156,5 +156,17 @@ def clean_timers():
     
     print(f"Cleaned up {len(to_delete)} timers")
 
+@app.route('/ads.txt')
+def ads_txt():
+    """Serve ads.txt for Google AdSense"""
+    ads_content = """google.com, pub-7642752202861694, DIRECT, f08c47fec0942fa0"""
+    
+    response = app.response_class(
+        response=ads_content,
+        status=200,
+        mimetype='text/plain'
+    )
+    return response
+
 if __name__ == '__main__':
     socketio.run(app, debug=Config.DEBUG, host='0.0.0.0', port=int(os.environ.get('PORT', 8443)))
