@@ -3,120 +3,132 @@
 {% block title %}Remote Timer Control{% endblock %}
 
 {% block content %}
-<div class="ad-container ad-top">
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-XXXXXXXXXX"
-         data-ad-slot="XXXXXXXXXX"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-</div>
-
-<div class="timer-card">
-    <div id="timer-container" data-timer-id="{{ timer_id }}" data-is-controller="{{ 'True' if is_controller else 'False' }}">
-        
-        <div class="timer-header">
-            <h1>Remote Timer Control</h1>
-            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
-                <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                </svg>
-                <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-                </svg>
-            </button>
-        </div>
-        
-        <div class="timer-body">
-            <div class="timer-display">
-                <div id="timer-status" class="timer-status {{ timer.status }}">{{ timer.status.capitalize() }}</div>
-                <div id="time" class="time">
-                    {% set hours = (timer.remaining // 3600) | int %}
-                    {% set minutes = ((timer.remaining % 3600) // 60) | int %}
-                    {% set seconds = (timer.remaining % 60) | int %}
-                    {{ "%02d:%02d:%02d" | format(hours, minutes, seconds) }}
-                </div>
-            </div>
-        </div>
-        
-        {% if is_controller %}
-        <div class="controls-section">
-            <div class="controls">
-                <button id="start-btn" class="btn btn-primary" {% if timer.status == "running" %}disabled{% endif %}>Start</button>
-                <button id="pause-btn" class="btn" {% if timer.status != "running" %}disabled{% endif %}>Pause</button>
-                <button id="reset-btn" class="btn btn-danger">Reset</button>
-            </div>
-            
-            <div class="duration-section">
-                <div class="section-title">Set Duration</div>
-                <form id="duration-form" class="duration-form">
-                    <div class="form-group">
-                        <label for="duration-input" class="form-label">Time (HH:MM:SS)</label>
-                        <input 
-                            type="text" 
-                            id="duration-input" 
-                            class="form-input" 
-                            placeholder="10:00"
-                            pattern="^(\d+:)?(\d{1,2}:)?\d{1,2}$"
-                            required
-                        >
-                    </div>
-                    <button type="submit" class="btn btn-primary">Update</button>
-                </form>
-            </div>
-        </div>
-        
-        <div class="links-section">
-            <div class="section-title">Share Links</div>
-            <div class="links-grid">
-                <div class="link-item">
-                    <div>
-                        <div class="link-label">Display Link (View Only)</div>
-                        <input type="text" class="link-input" value="{{ request.url_root }}?id={{ timer_id }}" readonly>
-                    </div>
-                    <button class="btn copy-btn">Copy</button>
+<div class="page-layout">
+    <div class="ad-container ad-left">
+        <div class="ad-placeholder">Ad<br>160x600</div>
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-7642752202861694"
+                 data-ad-slot="4014481178"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true">
+            </ins>
+    </div>
+    
+    <!-- Main Timer Content -->
+    <div class="main-content">
+        <div class="timer-card">
+            <div id="timer-container" data-timer-id="{{ timer_id }}" data-is-controller="{{ 'True' if is_controller else 'False' }}">
+                
+                <div class="timer-header">
+                    <h1>Remote Timer Control</h1>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+                        <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                    </button>
                 </div>
                 
-                <div class="link-item">
-                    <div>
-                        <div class="link-label">Control Link</div>
-                        <input type="text" class="link-input" value="{{ request.url_root }}control/{{ timer_id }}" readonly>
+                <div class="timer-body">
+                    <div class="timer-display">
+                        <div id="timer-status" class="timer-status {{ timer.status }}">{{ timer.status.capitalize() }}</div>
+                        <div id="time" class="time">
+                            {% set hours = (timer.remaining // 3600) | int %}
+                            {% set minutes = ((timer.remaining % 3600) // 60) | int %}
+                            {% set seconds = (timer.remaining % 60) | int %}
+                            {{ "%02d:%02d:%02d" | format(hours, minutes, seconds) }}
+                        </div>
                     </div>
-                    <button class="btn copy-btn">Copy</button>
                 </div>
+                
+                {% if is_controller %}
+                <div class="controls-section">
+                    <div class="sound-controls">
+                        <label class="sound-label" for="sound-select">Alert Sound:</label>
+                        <select id="sound-select" class="sound-select">
+                            <option value="none">None</option>
+                            <option value="beep" selected>Beep</option>
+                            <option value="chime">Chime</option>
+                            <option value="bell">Bell</option>
+                            <option value="buzzer">Buzzer</option>
+                        </select>
+                        <button id="test-sound-btn" class="btn test-sound-btn">Test</button>
+                    </div>
+                    
+                    <div class="controls">
+                        <button id="start-btn" class="btn btn-primary" {% if timer.status == "running" %}disabled{% endif %}>Start</button>
+                        <button id="pause-btn" class="btn" {% if timer.status != "running" %}disabled{% endif %}>Pause</button>
+                        <button id="reset-btn" class="btn btn-danger">Reset</button>
+                    </div>
+                    
+                    <div class="duration-section">
+                        <div class="section-title">Set Duration</div>
+                        <form id="duration-form" class="duration-form">
+                            <div class="form-group">
+                                <label for="duration-input" class="form-label">Time (HH:MM:SS)</label>
+                                <input 
+                                    type="text" 
+                                    id="duration-input" 
+                                    class="form-input" 
+                                    placeholder="10:00"
+                                    pattern="^(\d+:)?(\d{1,2}:)?\d{1,2}$"
+                                    required
+                                >
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="links-section">
+                    <div class="section-title">Share Links</div>
+                    <div class="links-grid">
+                        <div class="link-item">
+                            <div>
+                                <div class="link-label">Display Link (View Only)</div>
+                                <input type="text" class="link-input" value="{{ request.url_root }}?id={{ timer_id }}" readonly>
+                            </div>
+                            <button class="btn copy-btn">Copy</button>
+                        </div>
+                        
+                        <div class="link-item">
+                            <div>
+                                <div class="link-label">Control Link</div>
+                                <input type="text" class="link-input" value="{{ request.url_root }}control/{{ timer_id }}" readonly>
+                            </div>
+                            <button class="btn copy-btn">Copy</button>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="view-only-link">
+                    <a href="{{ url_for('control', timer_id=timer_id) }}">Take control of this timer</a>
+                </div>
+                {% endif %}
             </div>
         </div>
-        {% else %}
-        <div class="view-only-link">
-            <a href="{{ url_for('control', timer_id=timer_id) }}">Take control of this timer</a>
-        </div>
-        {% endif %}
+    </div>
+    
+    <!--Right Sidebar Ad (desktop only) -->
+    <div class="ad-container ad-right">
+        <div class="ad-placeholder">Ad<br>160x600</div>
+        Replace with actual ad code when ready
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-7642752202861694"
+                 data-ad-slot="4014481178"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true">
+            </ins>
     </div>
 </div>
 
-<!-- Bottom Ad -->
-<div class="ad-container ad-bottom">
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-XXXXXXXXXX"
-         data-ad-slot="XXXXXXXXXX"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-</div>
-
-<!-- Sidebar Ad (desktop only) -->
-<div class="ad-sidebar">
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-XXXXXXXXXX"
-         data-ad-slot="XXXXXXXXXX"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-</div>
-
+<!-- AdSense Script (uncomment when ready) -->
 <script>
      (adsbygoogle = window.adsbygoogle || []).push({});
      (adsbygoogle = window.adsbygoogle || []).push({});
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
+</script> -->
 {% endblock %}
